@@ -961,7 +961,7 @@ Ex: 'placa solar', 'bateria', 'gerador', 'eolica'#</dia:string>
             <dia:string>#id_orcamento#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#&lt;int&gt; FK#</dia:string>
+            <dia:string>#&lt;unsigned&gt; FK#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -984,7 +984,7 @@ Ex: 'placa solar', 'bateria', 'gerador', 'eolica'#</dia:string>
             <dia:string>#id_produto#</dia:string>
           </dia:attribute>
           <dia:attribute name="type">
-            <dia:string>#&lt;int&gt; FK#</dia:string>
+            <dia:string>#&lt;unsigned&gt; FK#</dia:string>
           </dia:attribute>
           <dia:attribute name="value">
             <dia:string>##</dia:string>
@@ -1102,7 +1102,7 @@ Ex: 'placa solar', 'bateria', 'gerador', 'eolica'#</dia:string>
         <dia:string>#n#</dia:string>
       </dia:attribute>
       <dia:attribute name="end_point_desc">
-        <dia:string>#n#</dia:string>
+        <dia:string>#1#</dia:string>
       </dia:attribute>
       <dia:attribute name="normal_font">
         <dia:font family="monospace" style="0" name="Courier"/>
@@ -1159,10 +1159,10 @@ Ex: 'placa solar', 'bateria', 'gerador', 'eolica'#</dia:string>
         <dia:enum val="0"/>
       </dia:attribute>
       <dia:attribute name="start_point_desc">
-        <dia:string>#n#</dia:string>
+        <dia:string>#1#</dia:string>
       </dia:attribute>
       <dia:attribute name="end_point_desc">
-        <dia:string>#1#</dia:string>
+        <dia:string>#n#</dia:string>
       </dia:attribute>
       <dia:attribute name="normal_font">
         <dia:font family="monospace" style="0" name="Courier"/>
