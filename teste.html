@@ -1,14 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE-edge">
-  <title>Page Title </title>
-  <meta name="viewport" content="width-device-width, initial-scale-1">
-  <link rel="stylesheet" type="text/css" media="screem" href="main.css">
-  <script src="main.jc"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuração do Motorhome</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-  <hi>Exemplo HTML GitHub</hi>
+    <h2>Escolha os itens para seu Motorhome</h2>
+
+    <form id="motorhomeForm">
+        <label for="geladeira">Geladeira:</label>
+        <select id="geladeira" name="geladeira" onchange="atualizarFotos()">
+            <option value="0">Nenhuma</option>
+        </select>
+        <br>
+
+        <label for="arcond">Ar-condicionado:</label>
+        <select id="arcond" name="arcond" onchange="atualizarFotos()">
+            <option value="0">Nenhum</option>
+        </select>
+        <br>
+
+        <label for="bomba_agua">Bomba d'água:</label>
+        <select id="bomba_agua" name="bomba_agua" onchange="atualizarFotos()">
+            <option value="0">Nenhuma</option>
+        </select>
+        <br>
+
+        <input type="button" value="Calcular Consumo" onclick="calcularConsumo()">
+    </form>
+
+    <h3>Fotos dos Itens Selecionados</h3>
+    <div id="fotos"></div>
+
+    <h3>Consumo da Bateria</h3>
+    <canvas id="graficoBateria"></canvas>
+    
+    <script>
+        async function calcularConsumo() {
+            const formData = new FormData(document.getElementById("motorhomeForm"));
+
+            const response = await fetch("/calcular", {
+                method: "POST",
+                body: formData
+            });
+
+            const dados = await response.json();
+
+            desenharGrafico(dados.tempo, dados.amperagem);
+        }
+
+        function desenharGrafico(tempo, amperagem) {
+            const ctx = document.getElementById('graficoBateria').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: tempo,
+                    datasets: [{
+                        label: 'Consumo da Bateria',
+                        data: amperagem,
+                        borderColor: 'red',
+                        borderWidth: 2
+                    }]
+                }
+            });
+        }
+    </script>
 </body>
 </html>

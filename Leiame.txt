@@ -1,0 +1,122 @@
+Projeto:
+
+1- Ativado a máquina virtual no Windows 11 wsl S.O. Ubuntu 24.4 
+    (está instalada no sistema default)
+O WSL (Windows Subsystem for Linux) é um recurso do Windows que permite 
+rodar um ambiente Linux diretamente no Windows, sem a necessidade de uma 
+máquina virtual ou dual boot. Ele é útil para desenvolvedores que precisam 
+de ferramentas Linux, como compiladores, servidores web e gerenciadores de 
+pacotes, enquanto ainda usam o Windows.
+
+Existem duas versões:
+
+WSL 1: Mais leve, usa uma camada de compatibilidade para executar 
+       binários Linux no Windows.
+WSL 2: Mais avançado, usa um kernel Linux real rodando em uma máquina 
+       virtual otimizada, oferecendo melhor desempenho e compatibilidade.
+
+1.1 Instalação
+1.1.1 Abrir o Prompt de Comando como Administrador
+      Pressione Win + X e selecione Terminal (Admin) ou Prompt de Comando (Admin).
+
+1.1.2 Executar o comando de instalação
+      Digite o seguinte comando e pressione Enter:
+      wsl --install
+
+      Isso instala o WSL 2, ativa os recursos necessários e baixa a distribuição 
+      padrão do Ubuntu.
+
+1.1.3 Reiniciar o computador (se for solicitado)
+
+1.1.4 Verificar a instalação
+      Após a reinicialização, abra o Prompt de Comando e digite:
+
+      wsl --list --verbose
+
+      Isso mostrará a versão do WSL instalada e as distribuições disponíveis.
+
+1.1.5 Atualizar para WSL 2 (se necessário)
+      Se o WSL ainda estiver na versão 1, você pode atualizá-lo para o WSL 2:
+
+      wsl --set-default-version 2
+
+      Se uma distribuição já estiver instalada na versão 1 e você quiser mudar 
+      para a versão 2:
+
+      wsl --set-version Ubuntu 2
+
+1.1.6 Depois de instalado, você pode rodar comandos Linux diretamente no Windows. 
+      Para abrir o WSL:
+
+      wsl
+
+      Para quem não esta acostumado com linha de comando e os comandos Linux
+      essa não é a melhor opção. Porém é a mais leve possível.
+
++-----------------------------------------------------------------------------+
+
+2- Instalado o Mysql, não existe de forma alguma ativar o Mysql Worbench
+   em processadores arm64 e o Mysql Worbench não oferece suporte para esse tipo 
+   de arquitetura de processador.
+
+   sudo apt install mysql-server -y
+
+2.1 Ativando o Mysql
+  
+    sudo service mysql start
+
+2.3 Se quiser que o MySQL inicie automaticamente sempre que o WSL for aberto:
+
+    sudo systemctl enable mysql
+
+2.4 O MySQL vem sem senha para o usuário root por padrão no Ubuntu. 
+    Para configurar, rode:
+
+    sudo mysql_secure_installation
+
+    Depois as configurações... Deve aparecer algo semelhante:
+    Durante o processo:
+
+      Definir senha para o root? (N) (N - No Ubuntu, o root usa auth_socket, não senha)
+      Remover usuários anônimos?  (Y)
+      Desativar login remoto do root?  (Y)
+      Remover banco de teste?  (Y)
+      Recarregar privilégios?  (Y)
+
+2.5 Instalação do mycli para auxiliar na composição dos Bancos de dados via 
+    Linha de comando.
+
+    sudo apt install mycli -y
+
+2.6 Para abrir o MySQL, use:
+
+    sudo mysql
+
+    Isso loga no MySQL como root.
+    Se quiser criar um usuário com senha para evitar o uso de sudo:
+
+    CREATE USER 'meuusuario'@'localhost' IDENTIFIED BY 'minhasenha';
+    GRANT ALL PRIVILEGES ON *.* TO 'meuusuario'@'localhost' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;
+
+2.7 Para sair do MySQL:
+
+    exit;
+
+2.8 Entrar com mycli:
+
+     mycli -u meuusuario -p senha minhasenha 
+     obs: ( a auth_socket do primeiro acesso ou o usuário criado )
+
+2.9 Se quiser acessar o MySQL rodando no WSL a partir do Windows, 
+    descubra o IP do WSL:
+
+    hostname -I
+
+2.10 Depois, conecte pelo MySQL Workbench ou outro cliente no Windows 
+     usando esse IP. Agora você tem o MySQL rodando dentro do WSL!
+
+
++-----------------------------------------------------------------------------+
+
+3
