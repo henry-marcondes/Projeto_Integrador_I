@@ -55,7 +55,7 @@ WSL 2: Mais avançado, usa um kernel Linux real rodando em uma máquina
 
 +-----------------------------------------------------------------------------+
 
-2- Instalado o Mysql, não existe de forma alguma ativar o Mysql Worbench
+2- Instalado o Mysql no WSL Ubuntu, não existe de forma alguma ativar o Mysql Worbench
    em processadores arm64 e o Mysql Worbench não oferece suporte para esse tipo 
    de arquitetura de processador.
 
@@ -119,4 +119,41 @@ WSL 2: Mais avançado, usa um kernel Linux real rodando em uma máquina
 
 +-----------------------------------------------------------------------------+
 
-3
+3 Preparando o ambiente para o Projeto
+    Como seu banco de dados está no WSL (Ubuntu), o ideal é rodar todo o Projeto
+    no mesmo ambiente, isso evita problemas de conexão entre o Python e o MySQL.
+
+    cd /home/seu_usuario/
+    mkdir Projeto_Integrador_I
+    cd Projeto_Integrador_I
+
+3.1  Ubuntu agora protege o ambiente Python do sistema contra modificações diretas 
+     pelo pip. O melhor jeito de evitar problemas é criar um ambiente virtual e 
+     instalar as dependências dentro dele:
+
+     # Atualizar pacotes
+     sudo apt update && sudo apt upgrade -y
+
+     # Instalar Python e pip (caso não tenha)
+     sudo apt install python3 python3-pip -y
+
+     # Criar um ambiente virtual chamado "venv"
+     python3 -m venv venv
+
+     # Ativar o ambiente virtual
+     source venv/bin/activate
+
+     # depois de ativado vc deve ver algo como:
+     (venv)fulano@nome_da_maquina:~/Projeto_Integrador_I$ 
+
+     # Para sair do ambiente virtual, na linha de comando digite:
+     deactivate
+
+3.3 Instalar Flask e mysql_connector_python e dependências no WSL. 
+
+     # Agora o pip funciona normalmente dentro do ambiente
+     pip install flask mysql-connector-python
+
+
+
+    

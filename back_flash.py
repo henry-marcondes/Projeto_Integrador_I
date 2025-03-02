@@ -43,6 +43,7 @@ def calcular_bateria(itens):
 @back_flash.route("/calcular", methods=["POST"])
 def calcular():
     itens_selecionados = request.form.to_dict()
+    print("Itens recebidos:", itens_selecionados)  # Debug no terminal
     tempo, amperagem = calcular_bateria(itens_selecionados)
 
     return jsonify({"tempo": tempo, "amperagem": amperagem})
