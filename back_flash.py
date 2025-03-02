@@ -1,13 +1,18 @@
 from flask import Flask, request, jsonify
 import mysql.connector
 
-app = Flask(__name__)
+back_flash = Flask(__name__)
+
+@back_flash.route("/")
+def home():
+    return open("index.html").read()  # Certifique-se de que "index.html" está na mesma pasta do seu script Flask.
+
 
 # Conexão com o MySQL
 # meu ip "172.23.43.51" 
 def conectar_bd():
     return mysql.connector.connect(
-        host="0.0.0.0",
+        host="127.0.0.1",
         user="henry",
         password="5563",
         database="ENERGI_M"
@@ -35,7 +40,7 @@ def calcular_bateria(itens):
 
     return tempo, amperagem
 
-@app.route("/calcular", methods=["POST"])
+@back_flash.route("/calcular", methods=["POST"])
 def calcular():
     itens_selecionados = request.form.to_dict()
     tempo, amperagem = calcular_bateria(itens_selecionados)
@@ -43,4 +48,5 @@ def calcular():
     return jsonify({"tempo": tempo, "amperagem": amperagem})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    back_flash.run(host="0.0.0.0", port=5000, debug=True)
+
