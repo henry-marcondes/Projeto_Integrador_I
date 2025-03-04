@@ -1,0 +1,257 @@
+Ativar mysql no wsl
+$ sudo apt update && sudo apt install mysql-server -y
+$ sudo service mysql start
+$ sudo service mysql status
+
+Entrar no mysql:
+$ sudo mysql -u root
+
+
+Opcional: para ativar na inicialização do ubuntu
+$ echo "sudo service mysql start" >> ~/.bashrc
+Aplicar imediatamente
+$ source ~/.bashrc
+
+Se precisar definir uma senha para o usuário root:
+  ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'minha_senha';
+  FLUSH PRIVILEGES;
+
+Conectar o MySQL ao VS Code (Opcional):
+  Se deseja acessar o MySQL pelo VS Code, instale a extensão "MySQL" e configure a conexão usando:
+
+  Host: localhost
+  Porta: 3306
+  Usuário: root
+  Senha: (se definida)
+
+
+
+COMANDOS BÁSICOS PARA SQL
+
+CRIAR :
++----------------------------------------------+
+Criar Banco de dados
+%
+CREATE BANK nome_do_Banco
+%
++----------------------------------------------+
+Acessar um banco de dados
+%
+USE nome_do_Banco
+%
++----------------------------------------------+
+Criar Tabelas
+%
+CREATE TABLE FUNCIONARIO(
+ ident INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ nome  VARCHAR(50) NOT NULL,
+ dtnasc DATE,
+ carro BOOLEAN COMMENT "SE TEM CARRO",
+ salario NUMERIC(10,2) COMMENT " 10 casas decimais e 2 após o ponto",
+ sexo  CHAR
+ id_endereco INT NOT NULL);
+ %
+ # É possível definir as chaves no final:
+ %
+ PRIMARY KEY(ident)
+ FOREIGN KEY(id_endereco) REFERENCES ENDERECO(id_endere) 
+ #se existir ja tabela);
+ %
+
++-------------------------------------------------------+
+
+CONSULTA:
+
+SHOW DATABASES;
+#MOSTRA todos bancos de dados existentes no seu mysql
+
++------------------------------------------------------+
+SHOW TABLES;
+# Mostra todas as tabelas do banco que vc está logado
+
++------------------------------------------------------+
+SHOW CREATE TABLE `PRODUTOS`;
+# Mostra em detalhes todas as informações da tabela criada
+
++-------------------------------------------------------+
+DESCRIBE FUNCIONARIO;
+# MOSTRA os campos da tabela e seus atributos RESUMIDOS
+
++--------------------------------------------------------+
+%
+SELECT id_clss FROM PRODUTOS WHERE id_clss 
+NOT IN (SELECT id_clss FROM Classe_PROD);
+%
+Se esse comando retornar algum valor, significa que há 
+registros "órfãos" em PRODUTOS
+
++--------------------------------------------------------+
+Forma para ver comentários das colunas sql
+%
+SELECT COLUMN_NAME, COLUMN_COMMENT
+FROM information_schema.COLUMNS
+WHERE TABLE_NAME = 'DEPARTAMENTO';
+%
+🔹 Explicação:
+
+#TABLE_NAME = 'DEPARTAMENTO' → Filtra a tabela específica.
+#TABLE_SCHEMA = 'EMPRESA' → Filtra pelo banco de dados onde a tabela 
+está armazenada.
+
++--------------------------------------------------------+
+Para filtrar apenas os nomes dos campos da tabela Classe_PROD, 
+sem incluir id_clss e clss_prd :
+%
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'ENERGI_M' 
+AND TABLE_NAME = 'Classe_PROD'
+AND COLUMN_NAME NOT IN ('id_clss', 'clss_prd');
+%
+
++------------------------------------------------------------------+
+
+ALTERAR tabela:
+%
+ALTER TABLE FUNCIONARIO ADD CONSTRAINT FUNC_DP FOREIGN KEY(dnumero) 
+REFERENCES DEPARTAMENTO (numero);
+%
+#FUNCIONARIO => A TABELA QUE VAI SER ALTERARDA
+#FUNC_DP     => O NOME DA RESTRIÇÃO (OPCIONAL)
+#FOREIGN KEY => A ALTERAÇÃO QUE VAI SER FEITA
+#(dnumero)   => O CAMPO QUE VAI SER RECERBER A CHAVE
+#REFERENCES  => QUAL TABELA ELE VAI USAR COMO REFERENCIA
+#(numero)    => o campo que vais ser usado
+
++------------------------------------------------------+
+ALTER TABLE FUNCIONARIO ALTER supident SET DEFAUT 1163;
+
+#ALTER      => ALTERAR 
+#supident   => nome do campo que vai ser alterado
+#SET DEFAULT=> SEMPRE que inserir um registro o valor é preenchido automático
+# 1163      => o valor default
+
++------------------------------------------------------+
+ALTER TABLE FUNCIONARIO ADD endereço VARCHAR(200);
+%
+#ADD          => ADICIONA endereço
+#endereco     => o campo que será adicionado
+#VARCHAR(200) => atributo do campo
+
++---------------------------------------------------------+
+EX. Para adicionar um comentário ao campo gident na 
+tabela DEPARTAMENTO, você pode usar o seguinte comando SQL:
+
+ALTER TABLE DEPARTAMENTO MODIFY gident INT COMMENT 'ID do 
+gerente do departamento';
+
+# Isso adiciona uma descrição ao campo gident, indicando que ele 
+# armazena o identificador do gerente do departamento.
+
++---------------------------------------------------------+
+EXCLUIR CAMPOS da tabela
+
+DROP TABLE FUNCIONARIO CASCADE;
+#DROP       => apaga a tabela
+#CASCADE    => apaga as relações também
+
++---------------------------------------------------------+
+ALTER TABLE FUNCIONARIO DROP endereço CASCADE;
+#DROP        => EXCLUIR
+#endereco    => o campo que vai ser excluído
+#CASCADE     => apaga mesmo que tiver outor tipo de restrição envolvido
+#RESTRICT    => OUTRA opção ao invés de Cascade funciona o oposto
+
++------------------------------------------------------------------+
+INSERIR DADOS:
+
+INSERT INTO FUNCIONARIO VALUES(1163,'Claudia','Morais',
+'Rua 1, nu.11,SP', 5558.00,'F',1,4);
+
+INSERT INTO FUNCIONARIO (ident, nome, sobrenome, dnumero) VALUES ( 1164, ’Jorge’, ’Vila Verde’, 1 );
+
+INSERT INTO DEPTS_INFO (DNOME, NO_FUNC, T_SALARIO)SELECT ... FROM ...;
+
+#(DNOME,NO_FUNC,T_SALARIO) => OS filtros da consulta
+#SELECT  => Geralmente uma tabela que vc quer consultar
+#FROM    => Um ou mais registros
+Uma consulta SQL para extração de informação existente em outras 
+tabelas do banco de dados. Retorna um conjunto de registros e 
+cada um deles será inserido na tabela DEPTS_INFO pelo comando 
+INSERT INTO.
+
++-------------------------------------------------------------+
+UPDATE PROJETO SET localização='Bahia', dnumero=5 WHERE numero=1;
+#UPDATE    =>
+#PROJETO   => TABELA
+#SET       => o que vai ser alterado
+#loca..=5, => os campo vai ser alterado com o novo valor
+#dnumero=1 => idem 
+#WHERE     => A condição necessária para a alterarção
+#numero=1  => na tabela o campo numero tem que ser igual a 1
+
++----------------------------------------------------------+
+UPDATE FUNCIONARIO SET salario = salario*1.1 WHERE dnumero IN
+(SELECT ... FROM ... WHERE ...)
+#Uma consulta SQL que retorna um conjunto de registros. A 
+ condição do comando UPDATE indica que dnumero deve pertencer 
+ ao conjunto de registros retornado.
+
++-----------------------------------------------------------+
+
+EXCUIR registros:
+
+DELETE FROM FUNCIONARIO;
+# deleta todos registros da tabela 'cuidado'
+
+DELETE FROM FUNCIONARIO WHERE ident = 1167;
+
+DELETE FROM FUNCIONARIO WHEREnome = ‘Caio’;
+
+DELETE FROM PRODUTOS WHERE id_clss NOT IN (SELECT id_clss FROM Classe_PROD);
+# Apagar os registros órfãos da tabela PRODUTOS
+  Se os dados em PRODUTOS não forem importantes
+
++------------------------------------------------------------------+
+Esquema para o modelo Relacional do contexto didático: 
+
+EMPRESA. 
+
+FUNCIONARIO (ident, nome, sobrenome, endereco, dtnasc, salario, sexo, supident, dnumero)
+#ident: PK (PRIMARY KEY)
+#supident: chave estrangeira proveniente da tabela FUNCIONARIO
+#dnumero: chave estrangeira proveniente da tabela DEPARTAMENTO 
+
+DEPENDENTE (fident, nome, dt_nasc, sexo, relacionamento) 
+#fident: chave estrangeira proveniente da tabela FUNCIONARIO
+
+DEPARTAMENTO (numero, nome, gident, dtinicio)
+#gident: chave estrangeira proveniente da tabela FUNCIONARIO 
+
+LOCALIZACOES (dnumero, localizacao)
+#dnumero: chave estrangeira proveniente da tabela DEPARTAMENTO 
+
+PROJETO (numero, nome, localizacao, dnumero)
+#dnumero: chave estrangeira proveniente da tabela LOCALIZACOES
+#localizacao: chave estrangeira proveniente da tabela LOCALIZACOES
+ 
+TRABALHA_EM (pnumero, fident, horas)
+#pnumero: chave estrangeira proveniente da tabela PROJETO
+#fident: chave estrangeira proveniente da tabela FUNCIONARIO
+
++--------------------------------------------------------------+
+
+EXPORTAR:
+
+ Exportar o banco de dados (Dump)
+No terminal (ou no MySQL Workbench), execute o seguinte comando:
+
+mysqldump -u root -p EMPRESA > empresa_backup.sql
+
+🔹 Explicação:
+
+ mysqldump → Comando para exportar o banco de dados.
+ -u root → Usuário do MySQL (substitua se necessário).
+ -p → Solicita a senha do MySQL.
+ EMPRESA → Nome do banco de dados a ser exportado.
+ > empresa_backup.sql → Salva o dump no arquivo empresa_backup.sql.

@@ -33,6 +33,40 @@ O que ela faz:
 Então, acessar /get_classes_prod retornará:
 
 ["Ar-Condicionado", "Climatizador", "Bomba d'Água"]
+
 Para que serve?
 Essa rota é usada pelo frontend para preencher dinamicamente o <select> de "Classe do Produto" na interface HTML.
+
+
+A função:
+
+@app.route('/get_produtos', methods=['POST'])
+def get_produtos():
+    data = request.json
+    classe_selecionada = data.get("classe")
+    produtos = classes_produtos.get(classe_selecionada, [])
+    return jsonify(produtos)
+
+O que ela faz?
+Define uma rota Flask
+
+1. A URL /get_produtos só aceita requisições POST.
+   Recebe dados do frontend
+
+2. O request.json pega os dados enviados no corpo da 
+   requisição em formato JSON.
+
+    data.get("classe") extrai a classe do produto que 
+    foi selecionada no dropdown.
+
+3. Obtém a lista de produtos da classe selecionada
+
+   classes_produtos.get(classe_selecionada, []) busca no dicionário classes_produtos os produtos dessa categoria.
+
+   Se a classe não existir, retorna uma lista vazia [].
+   
+4. Retorna a lista de produtos em JSON
+
+    jsonify(produtos) transforma a lista de produtos em um
+    formato JSON, para ser usado no frontend.
 

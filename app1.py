@@ -12,9 +12,6 @@ def conectar_bd():
         password="5563",
         database="ENERGI_M"
     )
-# Função para conectar ao banco
-#def get_db_connection():
-#    return mysql.connector.connect(**db_config)
 
 @app.route('/test_db')
 def test_db():
