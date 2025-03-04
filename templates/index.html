@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar Produto e Bateria</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .bateria {
+            width: 40px;
+            height: 20px;
+            border: 2px solid black;
+            position: relative;
+        }
+        .nivel {
+            height: 100%;
+            background-color: green;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Selecione um Produto</h1>
+    
+    <label for="classe_prod">Classe do Produto:</label>
+    <select id="classe_prod">
+        <option value="">Selecione...</option>
+    </select>
+    
+    <label for="produto">Produto:</label>
+    <select id="produto">
+        <option value="">Selecione uma classe primeiro...</option>
+    </select>
+    
+    <h2>Bateria</h2>
+    <button id="ver_bateria">Atualizar Bateria</button>
+    <div class="bateria">
+        <div class="nivel" id="nivel_bateria" style="width: 100%;"></div>
+    </div>
+    <p>Nível da bateria: <span id="bateria_percentual">100%</span></p>
+
+    <script>
+        $(document).ready(function () {
+            // Carregar classes de produtos
+            $.get("/get_classes_prod", function (data) {
+                data.forEach(classe => {
+                    $("#classe_prod").append(new Option(classe, classe));
+                });
+            });
+            
+            // Atualizar produtos ao selecionar classe
+            $("#classe_prod").change(function () {
+                var classeSelecionada = $(this).val();
+                $("#produto").empty().append(new Option("Selecione...", ""));
+                
+                if (classeSelecionada) {
+                    $.post("/get_produtos", JSON.stringify({ classe: classeSelecionada }), function (data) {
+                        data.forEach(produto => {
+                            $("#produto").append(new Option(produto, produto));
+                        });
+                    }, "json");
+                }
+            });
+
+            // Atualizar nível da bateria
+            $("#ver_bateria").click(function () {
+                $.get("/get_bateria", function (data) {
+                    var carga = data.carga;
+                    $("#bateria_percentual").text(carga + "%");
+                    $("#nivel_bateria").css("width", carga + "%");
+                    
+                    if (carga > 50) {
+                        $("#nivel_bateria").css("background-color", "green");
+                    } else if (carga > 20) {
+                        $("#nivel_bateria").css("background-color", "yellow");
+                    } else {
+                        $("#nivel_bateria").css("background-color", "red");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

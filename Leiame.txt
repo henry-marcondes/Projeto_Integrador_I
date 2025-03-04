@@ -154,6 +154,15 @@ WSL 2: Mais avançado, usa um kernel Linux real rodando em uma máquina
      # Agora o pip funciona normalmente dentro do ambiente
      pip install flask mysql-connector-python
 
++---------------------------------------------------------------------+
+
+
+ 
+
+
+
+
+
 
 
     
