@@ -17,6 +17,21 @@
             background-color: green;
             transition: width 0.5s;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+            text-align: center;
+        }
+        th, td {
+            padding: 10px;
+        }
+        .selected {
+            background-color: lightblue;
+        }
     </style>
 </head>
 <body>
@@ -27,11 +42,18 @@
         <option value="">Selecione...</option>
     </select>
     
-    <label for="produto">Produto:</label>
-    <select id="produto">
-        <option value="">Selecione uma classe primeiro...</option>
-    </select>
-    
+    <h2>Produtos da Classe Selecionada</h2>
+    <table id="tabela_produtos">
+        <thead>
+            <tr id="cabecalho_tabela">
+                <!-- Cabeçalho será gerado dinamicamente -->
+            </tr>
+        </thead>
+        <tbody id="corpo_tabela">
+            <!-- Linhas da tabela serão geradas dinamicamente -->
+        </tbody>
+    </table>
+
     <h2>Bateria</h2>
     <button id="ver_bateria">Atualizar Bateria</button>
     <div class="bateria">
@@ -47,32 +69,51 @@
                     $("#classe_prod").append(new Option(classe, classe));
                 });
             });
-            
-            // Atualizar produtos ao selecionar classe
+
+            // Atualizar tabela ao selecionar classe
             $("#classe_prod").change(function () {
-    var classeSelecionada = $(this).val();
-    $("#produto").empty().append(new Option("Selecione...", ""));
+                var classeSelecionada = $(this).val();
+                
+                if (classeSelecionada) {
+                    $.ajax({
+                        url: "/get_tabela_produtos",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ classe: classeSelecionada }),
+                        dataType: "json",
+                        success: function (data) {
+                            var colunas = data.colunas;
+                            var produtos = data.produtos;
 
-    if (classeSelecionada) {
-        $.ajax({
-            url: "/get_produtos",
-            type: "POST",
-            contentType: "application/json",  // <- Define corretamente o Content-Type
-            data: JSON.stringify({ classe: classeSelecionada }),  // <- Envia o JSON no formato correto
-            dataType: "json",
-            success: function (data) {
-                data.forEach(produto => {  // é uma lista
-                    $("#produto").append(new Option(produto, produto));
-                });
-            },
+                            // Atualiza cabeçalho
+                            $("#cabecalho_tabela").empty();
+                            colunas.forEach(coluna => {
+                                $("#cabecalho_tabela").append("<th>" + coluna + "</th>");
+                            });
 
-            error: function (xhr, status, error) {
-                console.error("Erro na requisição:", xhr.responseText);
-            }
-        });
-    }
-});
+                            // Atualiza corpo da tabela
+                            $("#corpo_tabela").empty();
+                            produtos.forEach(produto => {
+                                var linha = "<tr>";
+                                produto.forEach(valor => {
+                                    linha += "<td>" + valor + "</td>";
+                                });
+                                linha += "</tr>";
+                                $("#corpo_tabela").append(linha);
+                            });
 
+                            // Adicionar evento de clique para selecionar linha
+                            $("#corpo_tabela tr").click(function () {
+                                $("#corpo_tabela tr").removeClass("selected");
+                                $(this).addClass("selected");
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Erro ao buscar produtos:", xhr.responseText);
+                        }
+                    });
+                }
+            });
 
             // Atualizar nível da bateria
             $("#ver_bateria").click(function () {

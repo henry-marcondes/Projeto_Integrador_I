@@ -12,57 +12,6 @@ def conectar_bd():
         database="ENERGI_M"
     )
 
-# Lista para armazenar as classes de produtos
-classe_produtos = []
-
-# Função para buscar os dados do banco de dados
-def carregar_classes_produtos():
-    global classe_produtos  # Permite modificar a variável global
-    try:
-        conn = conectar_bd()
-        cursor = conn.cursor()
-        cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'ENERGI_M' AND TABLE_NAME = 'Classe_PROD' AND COLUMN_NAME NOT IN ('id_clss', 'clss_prd');")
-        tables = cursor.fetchall()
-        cursor.close()
-        conn.close()
-
-        # Limpa a lista antes de adicionar novos itens
-        classe_produtos.clear()
-        for table in tables:
-            classe_produtos.append(table[0])  # Extrai apenas o nome da coluna
-
-        print("Classes de produtos carregadas:", classe_produtos)  # Verifica a saída no terminal
-    except Exception as e:
-        print("Erro ao carregar classes de produtos:", str(e))
-
-# Chama a função para carregar os dados ao iniciar
-carregar_classes_produtos()
-
-caracteristicas = []
-def carregar_atributos(x):
-    global caracteristicas  # Permite modificar a variável global
-    try:
-        print(x)
-        x = str.upper(x)
-        conn = conectar_bd()
-        cursor = conn.cursor()
-        tabela = x
-        print(tabela)
-        parte_sql_1 = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'ENERGI_M' AND TABLE_NAME = '"
-        parte_final = "';"
-        com_sql = parte_sql_1 + tabela + parte_final
-        #cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'ENERGI_M' AND TABLE_NAME = 'Classe_PROD' AND COLUMN_NAME NOT IN ('id_clss', 'clss_prd');")
-        cursor.execute(com_sql)
-        tables = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        caracteristicas.clear()
-        for table in tables:
-            caracteristicas.append(table[0])
-        return caracteristicas
-    except Exception as e:
-        print("Erro ao carregar classes de produtos:", str(e))
-
 # Página inicial
 @app.route('/')
 def index():
@@ -71,17 +20,43 @@ def index():
 # Retorna as classes de produtos
 @app.route('/get_classes_prod', methods=['GET'])
 def get_classes_prod():
-    return jsonify(classe_produtos)
+    try:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+        cursor.execute("SHOW TABLES FROM ENERGI_M")
+        tables = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify([t[0] for t in tables])  # Retorna a lista de tabelas
+    except Exception as e:
+        return jsonify({"erro": str(e)})
 
-# Retorna os produtos de uma classe específica (A ser implementado corretamente)
-@app.route('/get_produtos', methods=['POST'])
-def get_produtos():
-    global classe_selecionada 
+# Retorna os produtos de uma classe específica como tabela
+@app.route('/get_tabela_produtos', methods=['POST'])
+def get_tabela_produtos():
     data = request.json
     classe_selecionada = data.get("classe")
-    atributos = carregar_atributos(classe_selecionada)
-    print("Classe selecionada: ", atributos)  # Exibe no terminal
-    return jsonify(atributos)  # 
+
+    try:
+        conn = conectar_bd()
+        cursor = conn.cursor()
+
+        # Obtém as colunas da tabela correspondente
+        cursor.execute(f"SHOW COLUMNS FROM {classe_selecionada}")
+        colunas = [col[0] for col in cursor.fetchall()]
+
+        # Obtém os produtos dessa classe
+        cursor.execute(f"SELECT g.fabricante,g.modelo,g.litros,v.v_12,v.watts,v.amper FROM {classe_selecionada} g INNER JOIN VOLTAGEM v ON g.voltagem = v.id_volt")
+        
+        produtos = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"colunas": colunas, "produtos": produtos})
+
+    except Exception as e:
+        return jsonify({"erro": str(e)})
 
 # Estado inicial da carga da bateria
 bateria_carga = 100
@@ -96,11 +71,6 @@ def set_bateria():
     data = request.json
     bateria_carga = max(0, min(100, data.get("carga", bateria_carga)))
     return jsonify({"status": "ok", "carga": bateria_carga})
-
-# Rota para testar a conexão com o banco
-@app.route('/test_db')
-def test_db():
-    return jsonify({"tables": classe_produtos})
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
