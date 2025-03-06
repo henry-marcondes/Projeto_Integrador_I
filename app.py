@@ -38,23 +38,30 @@ def carregar_classes_produtos():
 # Chama a função para carregar os dados ao iniciar
 carregar_classes_produtos()
 
+caracteristicas = []
 def carregar_atributos(x):
-    #global classe  # Permite modificar a variável global
+    global caracteristicas  # Permite modificar a variável global
     try:
+        print(x)
+        x = str.upper(x)
         conn = conectar_bd()
         cursor = conn.cursor()
-        cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'ENERGI_M' AND TABLE_NAME = 'Classe_PROD' AND COLUMN_NAME NOT IN ('id_clss', 'clss_prd');")
+        tabela = x
+        print(tabela)
+        parte_sql_1 = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'ENERGI_M' AND TABLE_NAME = '"
+        parte_final = "';"
+        com_sql = parte_sql_1 + tabela + parte_final
+        #cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'ENERGI_M' AND TABLE_NAME = 'Classe_PROD' AND COLUMN_NAME NOT IN ('id_clss', 'clss_prd');")
+        cursor.execute(com_sql)
         tables = cursor.fetchall()
         cursor.close()
         conn.close()
-        print("Produtos carregado:", classe_produtos)  # Verifica a saída no terminal
+        caracteristicas.clear()
+        for table in tables:
+            caracteristicas.append(table[0])
+        return caracteristicas
     except Exception as e:
         print("Erro ao carregar classes de produtos:", str(e))
-
-# Rota para testar a conexão com o banco
-@app.route('/test_db')
-def test_db():
-    return jsonify({"tables": classe_produtos})
 
 # Página inicial
 @app.route('/')
@@ -72,8 +79,9 @@ def get_produtos():
     global classe_selecionada 
     data = request.json
     classe_selecionada = data.get("classe")
-    print("Classe selecionada:", classe_selecionada)  # Exibe no terminal
-    return jsonify({"produtos": []})  # Retorna uma lista vazia até ser implementado
+    atributos = carregar_atributos(classe_selecionada)
+    print("Classe selecionada: ", atributos)  # Exibe no terminal
+    return jsonify(atributos)  # 
 
 # Estado inicial da carga da bateria
 bateria_carga = 100
@@ -88,6 +96,11 @@ def set_bateria():
     data = request.json
     bateria_carga = max(0, min(100, data.get("carga", bateria_carga)))
     return jsonify({"status": "ok", "carga": bateria_carga})
+
+# Rota para testar a conexão com o banco
+@app.route('/test_db')
+def test_db():
+    return jsonify({"tables": classe_produtos})
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

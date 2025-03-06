@@ -50,17 +50,29 @@
             
             // Atualizar produtos ao selecionar classe
             $("#classe_prod").change(function () {
-                var classeSelecionada = $(this).val();
-                $("#produto").empty().append(new Option("Selecione...", ""));
-                
-                if (classeSelecionada) {
-                    $.post("/get_produtos", JSON.stringify({ classe: classeSelecionada }), function (data) {
-                        data.forEach(produto => {
-                            $("#produto").append(new Option(produto, produto));
-                        });
-                    }, "json");
-                }
-            });
+    var classeSelecionada = $(this).val();
+    $("#produto").empty().append(new Option("Selecione...", ""));
+
+    if (classeSelecionada) {
+        $.ajax({
+            url: "/get_produtos",
+            type: "POST",
+            contentType: "application/json",  // <- Define corretamente o Content-Type
+            data: JSON.stringify({ classe: classeSelecionada }),  // <- Envia o JSON no formato correto
+            dataType: "json",
+            success: function (data) {
+                data.forEach(produto => {  // é uma lista
+                    $("#produto").append(new Option(produto, produto));
+                });
+            },
+
+            error: function (xhr, status, error) {
+                console.error("Erro na requisição:", xhr.responseText);
+            }
+        });
+    }
+});
+
 
             // Atualizar nível da bateria
             $("#ver_bateria").click(function () {

@@ -162,7 +162,7 @@ ALTER TABLE FUNCIONARIO DROP endereço CASCADE;
 #CASCADE     => apaga mesmo que tiver outor tipo de restrição envolvido
 #RESTRICT    => OUTRA opção ao invés de Cascade funciona o oposto
 
-+------------------------------------------------------------------+
++-----------------------------------------,-------------------------+
 INSERIR DADOS:
 
 INSERT INTO FUNCIONARIO VALUES(1163,'Claudia','Morais',
