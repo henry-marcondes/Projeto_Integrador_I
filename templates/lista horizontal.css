@@ -1,0 +1,10 @@
+.lista-horizontal {
+  display: flex;
+  list-style-type: none; /* Remove os marcadores padrão da lista */
+  padding: 0;
+  margin: 0;
+}
+
+.lista-horizontal li {
+  margin-right: 10px; /* Espaço entre os itens */
+}

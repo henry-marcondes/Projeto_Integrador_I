@@ -1,76 +1,94 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, jsonify, request, render_template
 import mysql.connector
 
 app = Flask(__name__)
 
-# Configuração do banco de dados
-def conectar_bd():
+registro_calculo = []  # Lista para armazenar os registros selecionados
+ 
+def conectar_banco():
     return mysql.connector.connect(
-        host="127.0.0.1",
-        user="henry",
-        password="5563",
-        database="ENERGI_M"
+        host="127.0.0.1",  # Altere conforme necessário
+        user="henry",  # Altere conforme necessário
+        password="5563",  # Altere conforme necessário
+        database="ENERGIA"  # Nome do seu banco de dados
     )
 
-# Página inicial
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Retorna as classes de produtos
-@app.route('/get_classes_prod', methods=['GET'])
-def get_classes_prod():
+@app.route('/tabelas')
+def obter_tabelas():
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    cursor.execute("SHOW TABLES")
+    #tabelas = [tabela[0] for tabela in cursor.fetchall()]
+    tabelas = [t[0] for t in cursor.fetchall()]
+    cursor.close()
+    conexao.close()
+    return jsonify(tabelas)
+
+@app.route('/dados', methods=['GET'])
+def dados():
+    tabela = request.args.get('tabela', '').upper()  # Captura o parâmetro GET
+    if not tabela:
+        return jsonify({"erro": "Nenhuma tabela foi informada"}), 400
+
+    dados = consultar_dados_do_banco(tabela)
+    return jsonify(dados)
+
+def consultar_dados_do_banco(tabela):
+    print(f"RECEBIDO: {tabela}")
+    conexao = conectar_banco()
+    cursor = conexao.cursor(dictionary=True)
+
+    # Lista de tabelas permitidas (evita SQL Injection)
+    tabelas_permitidas = ["GELADEIRA", "BATERIA", "CLIMATIZADOR", "BOMBA_DAGUA","TV"]
+
+    if tabela not in tabelas_permitidas:
+        print("Tabela não permitida!")
+        return []
+
+    # Executa consulta SQL segura
+    com_sql = f"SELECT * FROM {tabela};"
+
     try:
-        conn = conectar_bd()
-        cursor = conn.cursor()
-        cursor.execute("SHOW TABLES FROM ENERGI_M")
-        tables = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return jsonify([t[0] for t in tables])  # Retorna a lista de tabelas
+        cursor.execute(com_sql)
+        dados = cursor.fetchall()
+        print(f"Resultados encontrados: {len(dados)} registros")
     except Exception as e:
-        return jsonify({"erro": str(e)})
+        print(f"Erro ao executar SQL: {e}")
+        dados = []  # Retorna lista vazia em caso de erro
 
-# Retorna os produtos de uma classe específica como tabela
-@app.route('/get_tabela_produtos', methods=['POST'])
-def get_tabela_produtos():
-    data = request.json
-    classe_selecionada = data.get("classe")
+    cursor.close()
+    conexao.close()
 
+    return dados
+
+from collections import defaultdict
+
+@app.route('/salvar_registro', methods=['POST'])
+def salvar_registro():
+    global registro_calculo
     try:
-        conn = conectar_bd()
-        cursor = conn.cursor()
+        dados = request.get_json()  # Obtém os dados enviados pelo JavaScript
+        print(f"Dados recebidos: {dados}")  # Debug no terminal
 
-        # Obtém as colunas da tabela correspondente
-        cursor.execute(f"SHOW COLUMNS FROM {classe_selecionada}")
-        colunas = [col[0] for col in cursor.fetchall()]
+        # Evita duplicatas antes de adicionar
+        if dados not in registro_calculo:
+            registro_calculo.append(dados)
 
-        # Obtém os produtos dessa classe
-        cursor.execute(f"SELECT g.fabricante,g.modelo,g.litros,v.v_12,v.watts,v.amper FROM {classe_selecionada} g INNER JOIN VOLTAGEM v ON g.voltagem = v.id_volt")
-        
-        produtos = cursor.fetchall()
+        # Agrupa registros no dicionário sem sobrescrever
+        dicionario_unico = defaultdict(list)
+        for item in registro_calculo:
+            dicionario_unico[item['tabela']].append(item['potencia'])
 
-        cursor.close()
-        conn.close()
+        print(f"Lista atualizada: {dict(dicionario_unico)}")  # Debug no terminal
 
-        return jsonify({"colunas": colunas, "produtos": produtos})
-
+        return jsonify({"mensagem": "Registro salvo com sucesso!", "dados": dados}), 200
     except Exception as e:
-        return jsonify({"erro": str(e)})
+        return jsonify({"erro": f"Erro ao processar o registro: {str(e)}"}), 400
 
-# Estado inicial da carga da bateria
-bateria_carga = 100
 
-@app.route('/get_bateria', methods=['GET'])
-def get_bateria():
-    return jsonify({"carga": bateria_carga})
-
-@app.route('/set_bateria', methods=['POST'])
-def set_bateria():
-    global bateria_carga
-    data = request.json
-    bateria_carga = max(0, min(100, data.get("carga", bateria_carga)))
-    return jsonify({"status": "ok", "carga": bateria_carga})
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
