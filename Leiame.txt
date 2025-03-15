@@ -159,6 +159,11 @@ WSL 2: Mais avançado, usa um kernel Linux real rodando em uma máquina
 4. Falta Explicação do Processo de preparar o ambiente e clonar o 
     repositório GitHub.
 
++----------------------------------------------------------------------+
+5. Falta Explicação da página e como funciona
+
++----------------------------------------------------------------------+
+
 
  
 
