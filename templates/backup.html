@@ -71,27 +71,36 @@
             document.getElementById('tabela').innerHTML = tabelaHtml;
         }
 
-        function selecionarRegistro(linha, tabela, registro) {
-            // Remove destaque de qualquer linha previamente selecionada
-            document.querySelectorAll("tr").forEach(tr => tr.classList.remove("linha-selecionada"));
-            
-            // Adiciona destaque à linha selecionada
-            linha.classList.add("linha-selecionada");
+        async function selecionarRegistro(linha, tabela, registro) {
+          // Remove destaque de qualquer linha previamente selecionada
+          document.querySelectorAll("tr").forEach(tr => tr.classList.remove("linha-selecionada"));
 
-            // Exibe os detalhes do registro
-            let detalhes = `<h3>Detalhes do Registro</h3><ul>`;
-            for (const chave in registro) {
-                detalhes += `<li><strong>${chave}:</strong> ${registro[chave]}</li>`;
+          // Adiciona destaque à linha selecionada
+          linha.classList.add("linha-selecionada");
+
+          // Salva o nome da tabela e o campo 'Potencia' na lista registro_calculo
+          let potencia = parseFloat(registro.Potencia); // Garantir que Potencia seja número
+          let dadosRegistro = { tabela: tabela, potencia: potencia }; 
+
+          // Envia os dados para o backend Flask
+          try {
+              let resposta = await fetch('/salvar_registro', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dadosRegistro)  // Converte os dados para JSON e envia
+            });
+                console.log("Enviando:", JSON.stringify(dadosRegistro));
+                let resultado = await resposta.json();
+                console.log("Resposta do servidor:", resultado);
+            } catch (error) {
+                console.error("Erro ao enviar registro:", error);
             }
-            detalhes += `</ul>`;
-            document.getElementById('detalhes').innerHTML = detalhes;
-
-            // Salva o nome da tabela e o campo 'Potencia' na lista registro_calculo
-            let potencia = parseFloat(registro.Potencia); // Garantir que Potencia seja número
             registro_calculo.push([tabela, potencia]); // Adiciona à lista
             console.log("Registro salvo:", [tabela, potencia]); // Exibe no console
             console.log("Lista atualizada:", registro_calculo); // Exibe a lista completa
-        }
+        
+    }
+
 
         function mostrarRegistros() {
             // Exibe a lista de registros armazenados
@@ -108,7 +117,6 @@
     <h1>Dados do Banco</h1>
     <div id="lista-tabelas"></div>
     <div id="tabela"></div>
-    <div id="detalhes"></div>
     <div id="registros"></div> <!-- Div onde os registros salvos serão exibidos -->
     <button onclick="mostrarRegistros()">Mostrar Registros Salvos</button> <!-- Botão para exibir registros -->
 </body>

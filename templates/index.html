@@ -119,5 +119,52 @@
     <div id="tabela"></div>
     <div id="registros"></div> <!-- Div onde os registros salvos serão exibidos -->
     <button onclick="mostrarRegistros()">Mostrar Registros Salvos</button> <!-- Botão para exibir registros -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<canvas id="graficoAutonomia"></canvas>
+<button onclick="atualizarGrafico()">Atualizar Gráfico</button>
+
+<script>
+    async function atualizarGrafico() {
+        const resposta = await fetch('/obter_dados_grafico');
+        const dados = await resposta.json();
+
+        if (!dados.sucesso) {
+            alert("Erro ao obter dados do gráfico.");
+            return;
+        }
+
+        const tempo = dados.tempo;
+        const tota_fonte = dados.tota_fonte;
+
+        // Configuração do gráfico
+        const ctx = document.getElementById('graficoAutonomia').getContext('2d');
+        if (window.grafico) {
+            window.grafico.destroy(); // Evita múltiplos gráficos sobrepostos
+        }
+        window.grafico = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: tempo.map(t => t.toFixed(1)), // Formata tempo no eixo X
+                datasets: [{
+                    label: 'Fonte de Energia (Watts)',
+                    data: tota_fonte, // Agora contém os valores decrescentes
+                    borderColor: 'green',
+                    backgroundColor: 'rgba(0, 255, 0, 0.2)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Tempo (h)' } },
+                    y: { title: { display: true, text: 'Fonte (W)' }, beginAtZero: true }
+                }
+            }
+        });
+    }
+</script>
+
+
 </body>
 </html>

@@ -192,21 +192,18 @@ def calculo_de_consumo(gerador, consumidor):
 @app.route('/obter_dados_grafico', methods=['GET'])
 def obter_dados_grafico():
     global tota_fonte, total_carga
+    calculo_de_consumo(tota_fonte,total_carga)
 
     if total_carga == 0:
         return jsonify({"sucesso": False, "erro": "Carga total não definida"}), 400
 
     tempo = tota_fonte / total_carga if total_carga > 0 else 0
-    pontos = 11  # Número de pontos no gráfico
-    tempo_x = [tempo * i / (pontos - 1) for i in range(pontos)]  # Eixo X
-    fonte_y = [tota_fonte * (1 - i / (pontos - 1)) for i in range(pontos)]  # Descarga linear o ideal é implementar uma função
-    print(fonte_y)
     return jsonify({
         "sucesso": True,
-        "tempo": tempo_x,
-        "tota_fonte": fonte_y
+        "tota_fonte": tota_fonte,
+        "total_carga": total_carga,
+        "tempo": tempo
     })
-
    
 
 if __name__ == "__main__":
