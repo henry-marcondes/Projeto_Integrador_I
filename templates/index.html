@@ -123,6 +123,16 @@
 
 <canvas id="graficoAutonomia"></canvas>
 <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
+<button id="resetar" onclick="resetarPagina()">Resetar</button>
+
+<script>
+    async function resetarPagina() {
+        if (confirm("Tem certeza que deseja resetar tudo?")) {
+            await fetch('/resetar_dados', { method: 'POST' });
+            location.reload(); // Recarrega a página
+        }
+    }
+</script>
 
 <script>
     async function atualizarGrafico() {

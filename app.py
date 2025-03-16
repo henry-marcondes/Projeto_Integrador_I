@@ -200,13 +200,22 @@ def obter_dados_grafico():
     pontos = 11  # Número de pontos no gráfico
     tempo_x = [tempo * i / (pontos - 1) for i in range(pontos)]  # Eixo X
     fonte_y = [tota_fonte * (1 - i / (pontos - 1)) for i in range(pontos)]  # Descarga linear o ideal é implementar uma função
-    print(fonte_y)
+    #print(fonte_y)
     return jsonify({
         "sucesso": True,
         "tempo": tempo_x,
         "tota_fonte": fonte_y
     })
 
+@app.route('/resetar_dados', methods=['POST'])
+def resetar_dados():
+    global tota_fonte, total_carga,registro_calculo,dicionario_unico,diferenca  # Certifique-se de definir essas variáveis globalmente
+    registro_calculo = []  # Lista para armazenar os registros selecionados
+    dicionario_unico = {}  # Dicionario para armazenar item selecionados pelo usuario
+    total_carga = 0        # Total da carga de consumo Watts
+    tota_fonte = 0         # Total da fonte geradora em Watts
+    diferenca = []         # usada para atualizar a var local fonte
+    return jsonify({"sucesso": True, "mensagem": "Dados resetados com sucesso"})
    
 
 if __name__ == "__main__":
