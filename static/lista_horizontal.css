@@ -1,0 +1,50 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+}
+
+.coluna {
+  flex: 1;
+}
+
+.lista-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lista-horizontal li {
+  margin-right: 10px;
+  cursor: pointer;
+  background-color: #eef;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.linha-selecionada {
+  background-color: #ff0; /* Destaque para linha da tabela clicada */
+}
+
+.coluna-lista {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.coluna-lista li {
+  cursor: pointer;
+  padding: 5px;
+  margin-bottom: 5px;
+  background-color: #eef;
+  border-radius: 4px;
+}
+
+.coluna-lista li:hover {
+  background-color: #cce;
+}
+

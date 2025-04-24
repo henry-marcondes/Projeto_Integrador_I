@@ -26,22 +26,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='lista_horizontal.css') }}">
     <title>Consulta Banco de Dados</title>
     <script>
         let registro_calculo = []; // Lista para armazenar os dados selecionados (tabela e potência)
-
-        async function carregarTabelas() {
-            const resposta = await fetch('/tabelas');
-            const tabelas = await resposta.json();
-            let lista = '<h2>Tabelas no Banco</h2><ul class="lista-horizontal">';
-            
-            tabelas.forEach(tabela => {
-                lista += `<li onclick="selecionarTabela('${tabela}')">${tabela}</li>`;
-            });
-            
-            lista += '</ul>';
-            document.getElementById('lista-tabelas').innerHTML = lista;
-        }
+        
+            function carregarTabelas() {
+                let html = `
+                <div class="container">
+                    <div class="coluna">
+                        <h2>Produz Energia</h2>
+                        <ul class="lista-horizontal">
+                            <li onclick="selecionarTabela('BATERIA')">BATERIA</li>
+                            <li onclick="selecionarTabela('INVERSOR')">INVERSOR</li>
+                            <li onclick="selecionarTabela('PL_SOLAR')">PL_SOLAR</li>
+                            <li onclick="selecionarTabela('USINA')">USINA</li>
+                            <li onclick="selecionarTabela('CONTROLADORA')">CONTROLADORA</li>
+                        </ul>
+                    </div>
+                    <div class="coluna">
+                        <h2>Consome Energia</h2>
+                        <ul class="lista-horizontal">
+                            <li onclick="selecionarTabela('AR_CONDICIONADO')">AR_CONDICIONADO</li>
+                            <li onclick="selecionarTabela('BOMBA_AGUA')">BOMBA_AGUA</li>
+                            <li onclick="selecionarTabela('CLIMATIZADOR')">CLIMATIZADOR</li>
+                            <li onclick="selecionarTabela('DIVERSOS')">DIVERSOS</li>
+                            <li onclick="selecionarTabela('GELADEIRA')">GELADEIRA</li>
+                            <li onclick="selecionarTabela('TV')">TV</li>
+                        </ul>
+                    </div>
+                </div>`;
+                document.getElementById('lista-tabelas').innerHTML = html;
+            }
+        
 
         async function selecionarTabela(tabela) {
             console.log('Tabela selecionada:', tabela);
@@ -114,16 +131,43 @@
     </script>
 </head>
 <body onload="carregarTabelas()">
-    <h1>Dados do Banco</h1>
-    <div id="lista-tabelas"></div>
+    <h1 style="text-align: center;">Banco de Dados</h1>
+
+    <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+        <div>
+            <h2>Produz Energia</h2>
+            <ul class="coluna-lista">
+                <li onclick="selecionarTabela('BATERIA')">BATERIA</li>
+                <li onclick="selecionarTabela('INVERSOR')">INVERSOR</li>
+                <li onclick="selecionarTabela('PL_SOLAR')">PL_SOLAR</li>
+                <li onclick="selecionarTabela('USINA')">USINA</li>
+                <li onclick="selecionarTabela('CONTROLADORA')">CONTROLADORA</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2>Consome Energia</h2>
+            <ul class="coluna-lista">
+                <li onclick="selecionarTabela('AR_CONDICIONADO')">AR_CONDICIONADO</li>
+                <li onclick="selecionarTabela('BOMBA_AGUA')">BOMBA_AGUA</li>
+                <li onclick="selecionarTabela('CLIMATIZADOR')">CLIMATIZADOR</li>
+                <li onclick="selecionarTabela('DIVERSOS')">DIVERSOS</li>
+                <li onclick="selecionarTabela('GELADEIRA')">GELADEIRA</li>
+                <li onclick="selecionarTabela('TV')">TV</li>
+            </ul>
+        </div>
+    </div>
+
     <div id="tabela"></div>
-    <div id="registros"></div> <!-- Div onde os registros salvos serão exibidos -->
-    <button onclick="mostrarRegistros()">Mostrar Registros Salvos</button> <!-- Botão para exibir registros -->
+    <div id="registros"></div>
+    <button onclick="mostrarRegistros()">Mostrar Registros Salvos</button>
+
+    <h2>Gráfico</h2>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<canvas id="graficoAutonomia"></canvas>
-<button onclick="atualizarGrafico()">Atualizar Gráfico</button>
-<button id="resetar" onclick="resetarPagina()">Resetar</button>
+    <canvas id="graficoAutonomia"></canvas>
+    <button onclick="atualizarGrafico()">Atualizar Gráfico</button>
+    <button id="resetar" onclick="resetarPagina()">Resetar</button>
 
 <script>
     async function resetarPagina() {
