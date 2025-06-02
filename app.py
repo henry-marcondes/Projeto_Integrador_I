@@ -14,7 +14,7 @@ def conectar_banco():
     return mysql.connector.connect(
         host="127.0.0.1",  # Altere conforme necessário
         user="henry",  # Altere conforme necessário
-        password="5563",  # Altere conforme necessário
+        password="55631376",  # Altere conforme necessário
         database="ENERGIA",  # Nome banco de dados *** cuidado ao atualizar o banco de dados ***
         # talves seja o caso de criar um VIEM para os adm.( não sei fazer)
     )
